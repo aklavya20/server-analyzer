@@ -174,8 +174,8 @@
 
   - 6). Now run the project in android studio.
 # Installation of app   
-  Visit the following path to download the app.
-  - path: /build/app/outputs/flutter-apk/app-debug.apk
+  Visit the url to download the app.
+  - url: [server-analyzer](https://github.com/aklavya20/server-analyzer/releases/download/server-analyzer/server-analyzer.apk)
 # Usage
   - 1). Download the app. 
   - 2). On the right hand corner of the screen you may see the terminal logo here you can enter the custom server address, 
