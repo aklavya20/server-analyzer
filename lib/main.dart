@@ -35,7 +35,9 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Timer(Duration(seconds: 3), () {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Serveranalyzer()));
+        context,
+        MaterialPageRoute(builder: (context) => Serveranalyzer()),
+      );
     });
   }
 
@@ -60,6 +62,7 @@ class Serveranalyzer extends StatefulWidget {
 class ServeranalyzerState extends State<Serveranalyzer> {
   final TextEditingController commandController = TextEditingController();
   final TextEditingController targetController = TextEditingController();
+  final TextEditingController serverController = TextEditingController();
   String? selectedTargetSpec;
   String? selectedGeneralSettings;
   String? selectedTuning;
@@ -76,11 +79,7 @@ class ServeranalyzerState extends State<Serveranalyzer> {
   String? selectedMutate;
   String serverAddress = '';
   bool isScanning = false;
-  final List<String> targetSelectionOptions = [
-    '-host+',
-    '-url+',
-    '-vhost+',
-  ];
+  final List<String> targetSelectionOptions = ['-host+', '-url+', '-vhost+'];
   final List<String> generalSettingsOptions = [
     '-Pause+',
     '-nolookup',
@@ -109,9 +108,7 @@ class ServeranalyzerState extends State<Serveranalyzer> {
     'e',
     'x',
   ];
-  final List<String> portSpecOptions = [
-    '-port+',
-  ];
+  final List<String> portSpecOptions = ['-port+'];
   final List<String> loggingOptions = [
     '-Save',
     '-Display+',
@@ -125,20 +122,10 @@ class ServeranalyzerState extends State<Serveranalyzer> {
     'S',
     'V',
   ];
-  final List<String> pluginOptions = [
-    '-Plugins+',
-    '-list-plugins',
-  ];
-  final List<String> authenticationOptions = [
-    '-id+',
-    '-key+',
-    '-RSAcert+',
-  ];
+  final List<String> pluginOptions = ['-Plugins+', '-list-plugins'];
+  final List<String> authenticationOptions = ['-id+', '-key+', '-RSAcert+'];
   final List<String> mutateOptions = ['-mutate+', '-mutate-options'];
-  final List<String> timingOptions = [
-    '-maxtime+',
-    '-timeout+',
-  ];
+  final List<String> timingOptions = ['-maxtime+', '-timeout+'];
   final List<String> evasionOptions = [
     '-evasion+',
     '1',
@@ -161,7 +148,7 @@ class ServeranalyzerState extends State<Serveranalyzer> {
     'nbe',
     'sql',
     'txt',
-    'xml'
+    'xml',
   ];
   final List<String> miscOptions = [
     '-ipv4',
@@ -177,12 +164,9 @@ class ServeranalyzerState extends State<Serveranalyzer> {
     '-config+',
     '-Option',
     '-check6'
-        '-Cgidirs+'
+        '-Cgidirs+',
   ];
-  final List<String> updates = [
-    '-ask',
-    '-dbcheck',
-  ];
+  final List<String> updates = ['-ask', '-dbcheck'];
 
   void updateCommand() {
     String command = 'sudo nikto';
@@ -205,9 +189,7 @@ class ServeranalyzerState extends State<Serveranalyzer> {
 
   Future<String> sendCommandtoServer(String command) async {
     final url = Uri.parse(serverAddress);
-    final request = await http.post(url, body: {
-      'command': command,
-    });
+    final request = await http.post(url, body: {'command': command});
     if (request.statusCode == 200) {
       return request.body;
     } else {
@@ -306,9 +288,18 @@ class ServeranalyzerState extends State<Serveranalyzer> {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text('Server Address'),
-                  content: const TextField(
-                    decoration:
-                        InputDecoration(hintText: "Enter server address"),
+                  content: TextField(
+                    controller: serverController,
+                    decoration: InputDecoration(
+                        hintText: "Enter server address",
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black, width: 1),
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black, width: 1),
+                          borderRadius: BorderRadius.circular(11),
+                        )),
                   ),
                   actions: [
                     TextButton(
@@ -316,9 +307,13 @@ class ServeranalyzerState extends State<Serveranalyzer> {
                       onPressed: () => Navigator.pop(context),
                     ),
                     TextButton(
-                      child: const Text('Save'),
-                      onPressed: () => Navigator.pop(context, serverAddress),
-                    ),
+                        child: const Text('Save'),
+                        onPressed: () {
+                          setState(() {
+                            serverAddress = serverController.text;
+                          });
+                          Navigator.pop(context);
+                        }),
                   ],
                 ),
               );
@@ -348,8 +343,10 @@ class ServeranalyzerState extends State<Serveranalyzer> {
                   contentPadding: const EdgeInsets.all(16.0),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
-                    borderSide:
-                        const BorderSide(color: Colors.grey, width: 1.0),
+                    borderSide: const BorderSide(
+                      color: Colors.grey,
+                      width: 1.0,
+                    ),
                   ),
                 ),
               ),
@@ -364,98 +361,140 @@ class ServeranalyzerState extends State<Serveranalyzer> {
                   contentPadding: const EdgeInsets.all(16.0),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
-                    borderSide:
-                        const BorderSide(color: Colors.grey, width: 1.0),
+                    borderSide: const BorderSide(
+                      color: Colors.grey,
+                      width: 1.0,
+                    ),
                   ),
                 ),
               ),
             ),
-            buildDropdownRow('Target Selction', targetSelectionOptions,
-                'General Settings', generalSettingsOptions, (value) {
-              setState(() {
-                selectedTargetSpec = value;
-                updateCommand();
-              });
-            }, (value) {
-              setState(() {
-                selectedGeneralSettings = value;
-                updateCommand();
-              });
-            }),
             buildDropdownRow(
-                'Tuning', tuningOptions, 'Port Specification', portSpecOptions,
-                (value) {
-              setState(() {
-                selectedTuning = value;
-                updateCommand();
-              });
-            }, (value) {
-              setState(() {
-                selectedPortSpec = value;
-                updateCommand();
-              });
-            }),
+              'Target Selction',
+              targetSelectionOptions,
+              'General Settings',
+              generalSettingsOptions,
+              (value) {
+                setState(() {
+                  selectedTargetSpec = value;
+                  updateCommand();
+                });
+              },
+              (value) {
+                setState(() {
+                  selectedGeneralSettings = value;
+                  updateCommand();
+                });
+              },
+            ),
             buildDropdownRow(
-                'Logging Option', loggingOptions, 'Output', outputOptions,
-                (value) {
-              setState(() {
-                selectedlogging = value;
-                updateCommand();
-              });
-            }, (value) {
-              setState(() {
-                selectedOutput = value;
-                updateCommand();
-              });
-            }),
-            buildDropdownRow('Timing', timingOptions, 'Evasion', evasionOptions,
-                (value) {
-              setState(() {
-                selectedTiming = value;
-                updateCommand();
-              });
-            }, (value) {
-              setState(() {
-                selectedEvasion = value;
-                updateCommand();
-              });
-            }),
-            buildDropdownRow('Plugin', pluginOptions, 'Misc', miscOptions,
-                (value) {
-              setState(() {
-                selectedPlugin = value;
-                updateCommand();
-              });
-            }, (value) {
-              setState(() {
-                selectedMisc = value;
-                updateCommand();
-              });
-            }),
+              'Tuning',
+              tuningOptions,
+              'Port Specification',
+              portSpecOptions,
+              (value) {
+                setState(() {
+                  selectedTuning = value;
+                  updateCommand();
+                });
+              },
+              (value) {
+                setState(() {
+                  selectedPortSpec = value;
+                  updateCommand();
+                });
+              },
+            ),
             buildDropdownRow(
-                'Configurations', configurations, 'Updates', updates, (value) {
-              setState(() {
-                selectedConfiguration = value;
-                updateCommand();
-              });
-            }, (value) {
-              setState(() {
-                selectedUpdates = value;
-                updateCommand();
-              });
-            }),
-            buildDropdownRow('Authentication', authenticationOptions, 'Mutate',
-                mutateOptions, (value) {
-              setState(() {
-                selectedAuthentication = value;
-                updateCommand();
-              });
-            }, (value) {
-              setState(() {
-                selectedMutate = value;
-                updateCommand();
-              });
-            }),
+              'Logging Option',
+              loggingOptions,
+              'Output',
+              outputOptions,
+              (value) {
+                setState(() {
+                  selectedlogging = value;
+                  updateCommand();
+                });
+              },
+              (value) {
+                setState(() {
+                  selectedOutput = value;
+                  updateCommand();
+                });
+              },
+            ),
+            buildDropdownRow(
+              'Timing',
+              timingOptions,
+              'Evasion',
+              evasionOptions,
+              (value) {
+                setState(() {
+                  selectedTiming = value;
+                  updateCommand();
+                });
+              },
+              (value) {
+                setState(() {
+                  selectedEvasion = value;
+                  updateCommand();
+                });
+              },
+            ),
+            buildDropdownRow(
+              'Plugin',
+              pluginOptions,
+              'Misc',
+              miscOptions,
+              (value) {
+                setState(() {
+                  selectedPlugin = value;
+                  updateCommand();
+                });
+              },
+              (value) {
+                setState(() {
+                  selectedMisc = value;
+                  updateCommand();
+                });
+              },
+            ),
+            buildDropdownRow(
+              'Configurations',
+              configurations,
+              'Updates',
+              updates,
+              (value) {
+                setState(() {
+                  selectedConfiguration = value;
+                  updateCommand();
+                });
+              },
+              (value) {
+                setState(() {
+                  selectedUpdates = value;
+                  updateCommand();
+                });
+              },
+            ),
+            buildDropdownRow(
+              'Authentication',
+              authenticationOptions,
+              'Mutate',
+              mutateOptions,
+              (value) {
+                setState(() {
+                  selectedAuthentication = value;
+                  updateCommand();
+                });
+              },
+              (value) {
+                setState(() {
+                  selectedMutate = value;
+                  updateCommand();
+                });
+              },
+            ),
             Padding(
               padding: const EdgeInsets.only(top: 6.0),
               child: ElevatedButton(
@@ -472,11 +511,14 @@ class ServeranalyzerState extends State<Serveranalyzer> {
                 ),
                 child: isScanning
                     ? CircularProgressIndicator(color: Colors.white)
-                    : Text('Scan',
+                    : Text(
+                        'Scan',
                         style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20)),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
               ),
             ),
           ],
@@ -485,10 +527,7 @@ class ServeranalyzerState extends State<Serveranalyzer> {
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.dns,
-              color: Colors.grey,
-            ),
+            icon: Icon(Icons.dns, color: Colors.grey),
             label: "NIKTO",
           ),
           BottomNavigationBarItem(
@@ -515,12 +554,13 @@ class ServeranalyzerState extends State<Serveranalyzer> {
   }
 
   Widget buildDropdownRow(
-      String label1,
-      List<String> options1,
-      String label2,
-      List<String> options2,
-      ValueChanged<String?> onChanged1,
-      ValueChanged<String?> onChanged2) {
+    String label1,
+    List<String> options1,
+    String label2,
+    List<String> options2,
+    ValueChanged<String?> onChanged1,
+    ValueChanged<String?> onChanged2,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -543,10 +583,12 @@ class ServeranalyzerState extends State<Serveranalyzer> {
                     isExpanded: true,
                     hint: const Text('Select'),
                     items: options1
-                        .map((item) => DropdownMenuItem<String>(
-                              value: item,
-                              child: Text(item),
-                            ))
+                        .map(
+                          (item) => DropdownMenuItem<String>(
+                            value: item,
+                            child: Text(item),
+                          ),
+                        )
                         .toList(),
                     onChanged: onChanged1,
                   ),
@@ -573,10 +615,12 @@ class ServeranalyzerState extends State<Serveranalyzer> {
                     isExpanded: true,
                     hint: const Text('Select'),
                     items: options2
-                        .map((item) => DropdownMenuItem<String>(
-                              value: item,
-                              child: Text(item),
-                            ))
+                        .map(
+                          (item) => DropdownMenuItem<String>(
+                            value: item,
+                            child: Text(item),
+                          ),
+                        )
                         .toList(),
                     onChanged: onChanged2,
                   ),
@@ -610,34 +654,13 @@ class ScanResultState extends State<ScanResult> {
           bottom: const TabBar(
             isScrollable: true,
             tabs: [
-              Tab(
-                icon: Icon(Icons.code_off),
-                text: "XML",
-              ),
-              Tab(
-                icon: Icon(Icons.list_alt),
-                text: "TEXT",
-              ),
-              Tab(
-                icon: Icon(Icons.html_outlined),
-                text: "HTML",
-              ),
-              Tab(
-                icon: Icon(Icons.javascript),
-                text: "JSON",
-              ),
-              Tab(
-                icon: Icon(Icons.storage),
-                text: "SQL",
-              ),
-              Tab(
-                icon: Icon(Icons.drive_file_move),
-                text: "CSV",
-              ),
-              Tab(
-                icon: Icon(Icons.security_outlined),
-                text: "NBE",
-              ),
+              Tab(icon: Icon(Icons.code_off), text: "XML"),
+              Tab(icon: Icon(Icons.list_alt), text: "TEXT"),
+              Tab(icon: Icon(Icons.html_outlined), text: "HTML"),
+              Tab(icon: Icon(Icons.javascript), text: "JSON"),
+              Tab(icon: Icon(Icons.storage), text: "SQL"),
+              Tab(icon: Icon(Icons.drive_file_move), text: "CSV"),
+              Tab(icon: Icon(Icons.security_outlined), text: "NBE"),
             ],
           ),
         ),
@@ -655,10 +678,7 @@ class ScanResultState extends State<ScanResult> {
         bottomNavigationBar: BottomNavigationBar(
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.dns,
-                color: Colors.grey,
-              ),
+              icon: Icon(Icons.dns, color: Colors.grey),
               label: "NIKTO",
             ),
             BottomNavigationBarItem(
@@ -739,9 +759,7 @@ class ScanDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final extension = file.path.split('.').last;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(file.path.split('/').last),
-      ),
+      appBar: AppBar(title: Text(file.path.split('/').last)),
       body: FutureBuilder<String>(
         future: file.readAsString(),
         builder: (context, snapshot) {
