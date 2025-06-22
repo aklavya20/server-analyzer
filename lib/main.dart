@@ -141,14 +141,14 @@ class ServeranalyzerState extends State<Serveranalyzer> {
   ];
   final List<String> outputOptions = [
     '-output+',
-    '-Format+',
-    'csv',
-    'json',
-    'htm',
-    'nbe',
-    'sql',
-    'txt',
-    'xml',
+    '-o',
+    '-Format+csv',
+    '-Format+json',
+    '-Format+htm',
+    '-Format+nbe',
+    '-Format+sql',
+    '-Format+txt',
+    '-Format+xml',
   ];
   final List<String> miscOptions = [
     '-ipv4',
@@ -229,25 +229,25 @@ class ServeranalyzerState extends State<Serveranalyzer> {
     final outputFolder = await getApplicationDocumentsDirectory();
     final String outputFolderPath = outputFolder.path;
     switch (output) {
-      case 'txt':
+      case '-Format+txt':
         fileExtension = '.txt';
         break;
-      case 'xml':
+      case '-Format+xml':
         fileExtension = '.xml';
         break;
-      case 'json':
+      case '-Format+json':
         fileExtension = '.json';
         break;
-      case 'htm':
+      case '-Format+htm':
         fileExtension = '.html';
         break;
-      case 'csv':
+      case '-Format+csv':
         fileExtension = '.csv';
         break;
-      case 'sql':
+      case '-Format+sql':
         fileExtension = '.sql';
         break;
-      case 'nbe':
+      case '-Format+nbe':
         fileExtension = '.nbe';
         break;
     }
