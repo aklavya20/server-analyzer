@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:http/http.dart' as http;
+import 'package:share_plus/share_plus.dart';
 
 void main() {
   runApp(const ServeranalyzerApp());
@@ -706,47 +707,107 @@ class ScanResultState extends State<ScanResult> {
   }
 }
 
-class ScanFileList extends StatelessWidget {
+class ScanFileList extends StatefulWidget {
   final String extension;
   const ScanFileList({required this.extension, Key? key}) : super(key: key);
 
-  Future<List<File>> getScanFiles(String extension) async {
+  @override
+  State<ScanFileList> createState() => _ScanFileListState();
+}
+
+class _ScanFileListState extends State<ScanFileList> {
+  List<File> allFiles = [];
+  List<File> filteredFiles = [];
+  TextEditingController searchController = TextEditingController();
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadFiles();
+    searchController.addListener(onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> loadFiles() async {
     final directory = await getApplicationDocumentsDirectory();
     final files = directory
         .listSync()
         .whereType<File>()
-        .where((file) => file.path.endsWith(extension))
+        .where((file) => file.path.endsWith(widget.extension))
         .toList();
-    return files;
+
+    setState(() {
+      allFiles = files;
+      filteredFiles = files;
+      isLoading = false;
+    });
+  }
+
+  void onSearchChanged() {
+    final query = searchController.text.toLowerCase();
+    setState(() {
+      filteredFiles = allFiles
+          .where(
+              (file) => file.path.split('/').last.toLowerCase().contains(query))
+          .toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<File>>(
-      future: getScanFiles(extension),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final files = snapshot.data!;
-        return ListView.builder(
-          itemCount: files.length,
-          itemBuilder: (context, index) {
-            final file = files[index];
-            return ListTile(
-              title: Text(file.path.split('/').last),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ScanDetailPage(file: file),
-                  ),
-                );
-              },
-            );
-          },
-        );
-      },
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: searchController,
+            decoration: InputDecoration(
+              labelText: 'Search files',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: filteredFiles.isEmpty
+              ? const Center(child: Text('No files found.'))
+              : ListView.builder(
+                  itemCount: filteredFiles.length,
+                  itemBuilder: (context, index) {
+                    final file = filteredFiles[index];
+                    return ListTile(
+                      title: Text(file.path.split('/').last),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ScanDetailPage(file: file),
+                          ),
+                        );
+                      },
+                      trailing: IconButton(
+                        icon: const Icon(Icons.share),
+                        onPressed: () async {
+                          await Share.shareXFiles(
+                            [XFile(file.path)],
+                            text:
+                                'Sharing scan result file: ${file.path.split('/').last}',
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 }
