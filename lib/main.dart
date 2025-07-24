@@ -304,11 +304,17 @@ class ServeranalyzerState extends State<Serveranalyzer> {
                   ),
                   actions: [
                     TextButton(
-                      child: const Text('Cancel'),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(color: Colors.black),
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                     TextButton(
-                        child: const Text('Save'),
+                        child: const Text(
+                          'Save',
+                          style: TextStyle(color: Colors.black),
+                        ),
                         onPressed: () {
                           setState(() {
                             serverAddress = serverController.text;
@@ -526,6 +532,8 @@ class ServeranalyzerState extends State<Serveranalyzer> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dns, color: Colors.grey),
@@ -653,6 +661,7 @@ class ScanResultState extends State<ScanResult> {
         appBar: AppBar(
           title: const Text("Server Analyzer"),
           bottom: const TabBar(
+            tabAlignment: TabAlignment.start,
             isScrollable: true,
             tabs: [
               Tab(icon: Icon(Icons.code_off), text: "XML"),
@@ -677,6 +686,8 @@ class ScanResultState extends State<ScanResult> {
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.black,
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.dns, color: Colors.grey),
