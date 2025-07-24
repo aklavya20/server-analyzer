@@ -662,6 +662,8 @@ class ScanResultState extends State<ScanResult> {
           title: const Text("Server Analyzer"),
           bottom: const TabBar(
             tabAlignment: TabAlignment.start,
+            labelColor: Colors.black,
+            indicatorColor: Colors.black
             isScrollable: true,
             tabs: [
               Tab(icon: Icon(Icons.code_off), text: "XML"),
